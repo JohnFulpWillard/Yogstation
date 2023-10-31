@@ -387,6 +387,24 @@ GLOBAL_VAR(stormdamage)
 	if(culprit.mind?.has_antag_datum(/datum/antagonist/battleroyale))
 		last_hit = culprit.mind.has_antag_datum(/datum/antagonist/battleroyale)
 
+/obj/item/clothing/neck/tie/prevent_magic
+	name = "anti-magical tie"
+	desc = "A tie that, on the surface looks normal, but actually prevents the user from casting magicks."
+
+/obj/item/clothing/neck/tie/prevent_magic/equipped(mob/user, slot, initial = FALSE)
+	. = ..()
+	if(!(slot & slot_flags))
+		return
+	RegisterSignal(user, COMSIG_MOB_RESTRICT_MAGIC, PROC_REF(restrict_casting_magic))
+
+/obj/item/clothing/neck/tie/prevent_magic/dropped(mob/user)
+	. = ..()
+	UnregisterSignal(user, COMSIG_MOB_RESTRICT_MAGIC)
+
+///Prevents any magic from being used by the user.
+/obj/item/clothing/neck/tie/prevent_magic/proc/restrict_casting_magic(mob/user, magic_flags)
+	SIGNAL_HANDLER
+	return COMPONENT_MAGIC_BLOCKED
 
 /obj/structure/battle_bus
 	name = "The battle bus"
