@@ -625,23 +625,31 @@
 
 	if(mop_turf.wash(CLEAN_SCRUB))
 		cleaned = TRUE
-	for(var/atom/movable/moved_atom in newloc)
-		if(istype(moved_atom, /obj/effect/decal/nuclear_waste)) // sweep that nuclear waste under the rug
+	var/list/turf_objects_and_mobs = list()
+	for(var/obj/moved_object in newloc)
+		if(istype(moved_object, /obj/effect/decal/nuclear_waste)) // sweep that nuclear waste under the rug
 			cleaned = TRUE
-			playsound(moved_atom, 'sound/effects/gib_step.ogg', 50, 1)
-			qdel(moved_atom)
+			playsound(moved_object, 'sound/effects/gib_step.ogg', 50, 1)
+			qdel(moved_object)
 			continue
-		if(isobserver(moved_atom))
-			continue // what the fuck?
-		if(moved_atom.wash(CLEAN_SCRUB))
+		if(moved_object == chassis) //skip itself
+			continue
+		turf_objects_and_mobs += moved_object
+	for(var/mob/living/moved_mob in newloc)
+		if(!(moved_mob.movement_type & GROUND)) //not grounded, therefore unreachable.
+			continue
+		turf_objects_and_mobs += mobed_mobs
+	for(var/atom/movable/cleaning_atoms as anything in turf_objects_and_mobs)
+		if(cleaning_atoms.anchored)
+			continue
+		if(cleaning_atoms.wash(CLEAN_SCRUB))
 			cleaned = TRUE
-		if(moved_atom.anchored)
-			continue
-		if(moved_atom == chassis) // it can clean itself, but not move itself
-			continue
-		moved_atom.throw_at(thrown_at, throw_power, 1, mech.occupant, (throw_power > 1))
-		if(isliving(moved_atom) && throw_power > 1)
-			moved_atom.visible_message(span_danger("[mech] mops the floor with [moved_atom]!"), span_userdanger("[mech] mops the floor with you!"))
+		cleaning_atoms.throw_at(thrown_at, throw_power, 1, mech.occupant, (throw_power > 1))
+		if(isliving(cleaning_atoms) && throw_power > 1)
+			cleaning_atoms.visible_message(
+				span_danger("[mech] mops the floor with [cleaning_atoms]!"),
+				span_userdanger("[mech] mops the floor with you!"),
+			)
 
 	if(cleaned)
 		playsound(newloc, 'sound/effects/slosh.ogg', 25, 1)
