@@ -119,6 +119,8 @@
 	var/cap = CONFIG_GET(number/ratcap)
 	var/something_from_nothing = FALSE
 	for(var/mob/living/simple_animal/mouse/M in oview(owner, 5))
+		if(M.stat == DEAD)
+			continue
 		var/mob/living/simple_animal/hostile/rat/new_rat = new(get_turf(M))
 		var/bodycolor = M.body_color
 		new_rat.body_color = bodycolor
@@ -127,8 +129,7 @@
 			new_rat.icon_living = "mouse_[new_rat.body_color]"
 			new_rat.icon_dead = "mouse_[new_rat.body_color]_dead"
 		something_from_nothing = TRUE
-		if(M.mind && M.stat == CONSCIOUS)
-			M.mind.transfer_to(new_rat)
+		M.mind.transfer_to(new_rat)
 		if(istype(owner,/mob/living/simple_animal/hostile/regalrat))
 			var/mob/living/simple_animal/hostile/regalrat/giantrat = owner
 			new_rat.faction = giantrat.faction

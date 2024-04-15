@@ -107,7 +107,6 @@
 	src.faction = list("rat")
 	src.layer = BELOW_OPEN_DOOR_LAYER
 	src.language_holder = new /datum/language_holder/mouse(src)
-	src.pass_flags |= PASSDOOR
 	src.sentience_act()
 	src.health = src.maxHealth
 
